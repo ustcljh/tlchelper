@@ -15,6 +15,15 @@ namespace TLCHelper
 {
     public partial class MainWindow : Form
     {
+        public class TLCMarkingPoint
+        {
+            public PointF Position { get; set; }
+            public string Name { get; set; } = "";
+        }
+
+        Bitmap? TLCimage = null;
+        List<TLCMarkingPoint> markingPoints = new List<TLCMarkingPoint>();
+
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             if (keyData == Keys.O)
@@ -66,7 +75,8 @@ namespace TLCHelper
             {
                 Bitmap bitmap = new Bitmap(dialog.FileName);
 
-                pictureBox1.Image = bitmap;
+                TLCimage = bitmap;
+                RefreshImageView();
 
                 ClickPointList.Clear();
                 BaselinePoints.Clear();
@@ -79,6 +89,32 @@ namespace TLCHelper
             }
         }
 
+        private void RefreshImageView()
+        {
+            if (TLCimage == null)
+            {
+                pictureBox1.Image = null;
+                return;
+            }
+
+            Bitmap TLCdraw = ImageProcess.ResizeImage(TLCimage, pictureBox1.Width, pictureBox1.Height);
+            Graphics graphics = Graphics.FromImage(TLCdraw);
+
+            float radius = 20, penWidth = 3;
+
+            foreach (var mark in markingPoints)
+            {
+                using (Pen pen = new Pen(Color.White, penWidth))
+                {
+                    // Draw ellipse on the mask
+                    float diameter = radius * 2;
+                    graphics.DrawEllipse(pen, mark.Position.X * TLCdraw.Width - radius, mark.Position.Y * TLCdraw.Height - radius, diameter, diameter);
+                }
+            }
+
+            pictureBox1.Image = TLCdraw;
+        }
+
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MessageBox.Show("TLC Helper: A tiny tool for easily compute RF values from photo of TLC plates.\nWritten by Jiahong Luo @ Dept. of Chemical Physics, USTC", "About TLCHelper");
@@ -88,12 +124,13 @@ namespace TLCHelper
         bool MarkingTLCPlate = false;
         bool MarkingBaseline = false;
         bool MarkingSolventFront = false;
+        bool MarkingResultPoint = false;
 
         List<PointF> BaselinePoints = new(), SolventFrontPoints = new();
 
         private void markTLCPlaneToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (pictureBox1.Image == null)
+            if (TLCimage == null)
             {
                 MessageBox.Show("You need to load a photo of the TLC plate first.");
                 return;
@@ -116,10 +153,23 @@ namespace TLCHelper
 
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
         {
+            if (TLCimage == null)
+            {
+                return;
+            }
+
             float x = (float)e.X / pictureBox1.Width;
             float y = (float)e.Y / pictureBox1.Height;
 
-            if (MarkingBaseline)
+            if (MarkingResultPoint)
+            {
+                markingPoints.Add(new TLCMarkingPoint() { Name = "Compound", Position = new(x, y) });
+                MarkingResultPoint = false;
+                pictureBox1.Cursor = Cursors.Default;
+
+                RefreshImageView();
+            }
+            else if (MarkingBaseline)
             {
                 ClickPointList.Add(new PointF(x, y));
 
@@ -142,7 +192,7 @@ namespace TLCHelper
                         MessageBox.Show("The baseline has been marked!");
                         markBaselineToolStripMenuItem.BackColor = Color.LightGreen;
 
-                        if (pictureBox1.Image != null && BaselinePoints.Count() == 2 && SolventFrontPoints.Count() == 2)
+                        if (TLCimage != null && BaselinePoints.Count() == 2 && SolventFrontPoints.Count() == 2)
                         {
                             pictureBox1.Cursor = Cursors.Cross;
                         }
@@ -173,7 +223,7 @@ namespace TLCHelper
                         MessageBox.Show("The solvent front has been marked!");
                         markSolventFrontToolStripMenuItem.BackColor = Color.LightGreen;
 
-                        if (pictureBox1.Image != null && BaselinePoints.Count() == 2 && SolventFrontPoints.Count() == 2)
+                        if (TLCimage != null && BaselinePoints.Count() == 2 && SolventFrontPoints.Count() == 2)
                         {
                             pictureBox1.Cursor = Cursors.Cross;
                         }
@@ -206,7 +256,7 @@ namespace TLCHelper
 
                         for (int i = 0; i < ClickPointList.Count; i++)
                         {
-                            PointF point = new(ClickPointList[i].X * pictureBox1.Image.Width, ClickPointList[i].Y * pictureBox1.Image.Height);
+                            PointF point = new(ClickPointList[i].X * TLCimage.Width, ClickPointList[i].Y * TLCimage.Height);
                             EdgePointList2.Add(point);
                         }
 
@@ -214,8 +264,8 @@ namespace TLCHelper
                         toolStripStatusLabelTip.Text = "Ready";
                         pictureBox1.Cursor = Cursors.Default;
 
-                        var newBitmap = ImageProcess.Transform(new Bitmap(pictureBox1.Image), EdgePointList2.ToArray(), 1000, 500);
-                        pictureBox1.Image = newBitmap;
+                        TLCimage = ImageProcess.Transform(new Bitmap(TLCimage), EdgePointList2.ToArray(), 1000, 500);
+                        RefreshImageView();
 
                         MessageBox.Show("The edge has been marked!");
 
@@ -233,7 +283,7 @@ namespace TLCHelper
 
         private void markBaselineToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (pictureBox1.Image == null)
+            if (TLCimage == null)
             {
                 MessageBox.Show("You need to load a photo of the TLC plate first.");
                 return;
@@ -251,7 +301,7 @@ namespace TLCHelper
 
         private void markSolventFrontToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (pictureBox1.Image == null)
+            if (TLCimage == null)
             {
                 MessageBox.Show("You need to load a photo of the TLC plate first.");
                 return;
@@ -269,7 +319,7 @@ namespace TLCHelper
 
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
-            if (pictureBox1.Image == null || BaselinePoints.Count() != 2 || SolventFrontPoints.Count() != 2)
+            if (TLCimage == null || BaselinePoints.Count() != 2 || SolventFrontPoints.Count() != 2)
             {
                 toolStripStatusLabelRF.Text = "Mark baseline and solvent front first";
                 return;
@@ -289,12 +339,24 @@ namespace TLCHelper
 
         private void markSpeciesPointToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (TLCimage == null)
+            {
+                MessageBox.Show("You need to load a photo of the TLC plate first.");
+                return;
+            }
 
+            MarkingResultPoint = true;
+            pictureBox1.Cursor = Cursors.Cross;
         }
 
         private void exportImageToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void MainWindow_Resize(object sender, EventArgs e)
+        {
+            RefreshImageView();
         }
     }
 }

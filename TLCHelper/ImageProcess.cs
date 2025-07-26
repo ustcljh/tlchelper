@@ -276,5 +276,20 @@ namespace TLCHelper
             float dy = p2.Y - p1.Y;
             return (float)Math.Sqrt(dx * dx + dy * dy);
         }
+
+        public static Bitmap ResizeImage(Image original, int targetWidth, int targetHeight)
+        {
+            Bitmap resized = new Bitmap(targetWidth, targetHeight);
+            using (Graphics g = Graphics.FromImage(resized))
+            {
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.HighQuality;
+                g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+
+                g.DrawImage(original, 0, 0, targetWidth, targetHeight);
+            }
+            return resized;
+        }
     }
 }

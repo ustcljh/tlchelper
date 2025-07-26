@@ -55,21 +55,21 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { loadPhotoToolStripMenuItem, markTLCPlaneToolStripMenuItem, markBaselineToolStripMenuItem, markSolventFrontToolStripMenuItem, markToolStripMenuItem, aboutToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(1338, 42);
+            menuStrip1.Size = new Size(1338, 40);
             menuStrip1.TabIndex = 0;
             menuStrip1.Text = "menuStrip1";
             // 
             // loadPhotoToolStripMenuItem
             // 
             loadPhotoToolStripMenuItem.Name = "loadPhotoToolStripMenuItem";
-            loadPhotoToolStripMenuItem.Size = new Size(195, 38);
+            loadPhotoToolStripMenuItem.Size = new Size(195, 36);
             loadPhotoToolStripMenuItem.Text = "[O] Load photo";
             loadPhotoToolStripMenuItem.Click += loadPhotoToolStripMenuItem_Click;
             // 
             // markTLCPlaneToolStripMenuItem
             // 
             markTLCPlaneToolStripMenuItem.Name = "markTLCPlaneToolStripMenuItem";
-            markTLCPlaneToolStripMenuItem.Size = new Size(233, 38);
+            markTLCPlaneToolStripMenuItem.Size = new Size(233, 36);
             markTLCPlaneToolStripMenuItem.Text = "[P] Mark TLC plane";
             markTLCPlaneToolStripMenuItem.Click += markTLCPlaneToolStripMenuItem_Click;
             // 
@@ -77,7 +77,7 @@
             // 
             markBaselineToolStripMenuItem.BackColor = Color.Silver;
             markBaselineToolStripMenuItem.Name = "markBaselineToolStripMenuItem";
-            markBaselineToolStripMenuItem.Size = new Size(218, 38);
+            markBaselineToolStripMenuItem.Size = new Size(218, 36);
             markBaselineToolStripMenuItem.Text = "[B] Mark baseline";
             markBaselineToolStripMenuItem.Click += markBaselineToolStripMenuItem_Click;
             // 
@@ -85,7 +85,7 @@
             // 
             markSolventFrontToolStripMenuItem.BackColor = Color.Silver;
             markSolventFrontToolStripMenuItem.Name = "markSolventFrontToolStripMenuItem";
-            markSolventFrontToolStripMenuItem.Size = new Size(264, 38);
+            markSolventFrontToolStripMenuItem.Size = new Size(264, 36);
             markSolventFrontToolStripMenuItem.Text = "[F] Mark solvent front";
             markSolventFrontToolStripMenuItem.Click += markSolventFrontToolStripMenuItem_Click;
             // 
@@ -93,7 +93,7 @@
             // 
             markToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { markSpeciesPointToolStripMenuItem, drawBaselineToolStripMenuItem, drawSolventFrontToolStripMenuItem, toolStripSeparator1, exportImageToolStripMenuItem });
             markToolStripMenuItem.Name = "markToolStripMenuItem";
-            markToolStripMenuItem.Size = new Size(116, 38);
+            markToolStripMenuItem.Size = new Size(116, 36);
             markToolStripMenuItem.Text = "Analyse";
             // 
             // markSpeciesPointToolStripMenuItem
@@ -132,7 +132,7 @@
             // aboutToolStripMenuItem
             // 
             aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            aboutToolStripMenuItem.Size = new Size(99, 38);
+            aboutToolStripMenuItem.Size = new Size(99, 36);
             aboutToolStripMenuItem.Text = "About";
             aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
             // 
@@ -140,9 +140,9 @@
             // 
             pictureBox1.BackColor = SystemColors.ControlDark;
             pictureBox1.Dock = DockStyle.Fill;
-            pictureBox1.Location = new Point(0, 42);
+            pictureBox1.Location = new Point(0, 40);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(1338, 623);
+            pictureBox1.Size = new Size(1338, 625);
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox1.TabIndex = 1;
             pictureBox1.TabStop = false;
@@ -184,6 +184,7 @@
             MainMenuStrip = menuStrip1;
             Name = "MainWindow";
             Text = "TLC Helper";
+            Resize += MainWindow_Resize;
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
