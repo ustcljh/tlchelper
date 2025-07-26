@@ -1,15 +1,16 @@
 ﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System;
-using System.Drawing;
-using System.Drawing.Imaging;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace TLCHelper
 {
@@ -101,11 +102,28 @@ namespace TLCHelper
             Graphics graphics = Graphics.FromImage(TLCdraw);
 
             float radius = 20, penWidth = 3;
+            var font = new System.Drawing.Font("Arial", 20);
 
             foreach (var mark in markingPoints)
             {
                 using (Pen pen = new Pen(Color.White, penWidth))
+                using (Brush brush = new SolidBrush(Color.White))
                 {
+                    string markText = $"{mark.Name}";
+                    var RF = ComputeRF(mark.Position);
+                    if (RF != null)
+                    {
+                        markText += $"\r\n{RF:F3}";
+                    }
+
+                    SizeF textSize = graphics.MeasureString(markText, font);
+
+                    // Calculate top-left point so that text is bottom-centered at anchorPoint
+                    float drawX = mark.Position.X * TLCdraw.Width - textSize.Width / 2;
+                    float drawY = mark.Position.Y * TLCdraw.Height - textSize.Height - font.Size;
+
+                    graphics.DrawString(markText, font, brush, new PointF(drawX, drawY));
+
                     // Draw ellipse on the mask
                     float diameter = radius * 2;
                     graphics.DrawEllipse(pen, mark.Position.X * TLCdraw.Width - radius, mark.Position.Y * TLCdraw.Height - radius, diameter, diameter);
@@ -195,6 +213,7 @@ namespace TLCHelper
                         if (TLCimage != null && BaselinePoints.Count() == 2 && SolventFrontPoints.Count() == 2)
                         {
                             pictureBox1.Cursor = Cursors.Cross;
+                            RefreshImageView();
                         }
 
                         break;
@@ -226,6 +245,7 @@ namespace TLCHelper
                         if (TLCimage != null && BaselinePoints.Count() == 2 && SolventFrontPoints.Count() == 2)
                         {
                             pictureBox1.Cursor = Cursors.Cross;
+                            RefreshImageView();
                         }
 
                         break;
@@ -317,6 +337,20 @@ namespace TLCHelper
             }
         }
 
+        private double? ComputeRF(PointF point)
+        {
+            if (BaselinePoints.Count() != 2 || SolventFrontPoints.Count() != 2)
+            {
+                return null;
+            }
+
+            var distBaseline = ImageProcess.DistancePointToLine(point, BaselinePoints[0], BaselinePoints[1]);
+            var distSolventFront = ImageProcess.DistancePointToLine(point, SolventFrontPoints[0], SolventFrontPoints[1]);
+
+            var totalHeight = distBaseline + distSolventFront;
+            return distBaseline / totalHeight;
+        }
+
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
             if (TLCimage == null || BaselinePoints.Count() != 2 || SolventFrontPoints.Count() != 2)
@@ -328,11 +362,7 @@ namespace TLCHelper
             float x = (float)e.X / pictureBox1.Width;
             float y = (float)e.Y / pictureBox1.Height;
 
-            var distBaseline = ImageProcess.DistancePointToLine(new PointF(x, y), BaselinePoints[0], BaselinePoints[1]);
-            var distSolventFront = ImageProcess.DistancePointToLine(new PointF(x, y), SolventFrontPoints[0], SolventFrontPoints[1]);
-
-            var totalHeight = distBaseline + distSolventFront;
-            var RF = distBaseline / totalHeight;
+            var RF = ComputeRF(new PointF(x, y));
 
             toolStripStatusLabelRF.Text = $"Lane RF value = {RF:F3}";
         }
