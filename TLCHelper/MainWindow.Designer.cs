@@ -44,6 +44,7 @@
             statusStrip1 = new StatusStrip();
             toolStripStatusLabelTip = new ToolStripStatusLabel();
             toolStripStatusLabelRF = new ToolStripStatusLabel();
+            toolStripStatusLabelNearPoint = new ToolStripStatusLabel();
             menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             statusStrip1.SuspendLayout();
@@ -109,12 +110,14 @@
             drawBaselineToolStripMenuItem.Name = "drawBaselineToolStripMenuItem";
             drawBaselineToolStripMenuItem.Size = new Size(375, 44);
             drawBaselineToolStripMenuItem.Text = "Draw baseline";
+            drawBaselineToolStripMenuItem.Click += drawBaselineToolStripMenuItem_Click;
             // 
             // drawSolventFrontToolStripMenuItem
             // 
             drawSolventFrontToolStripMenuItem.Name = "drawSolventFrontToolStripMenuItem";
             drawSolventFrontToolStripMenuItem.Size = new Size(375, 44);
             drawSolventFrontToolStripMenuItem.Text = "Draw solvent front";
+            drawSolventFrontToolStripMenuItem.Click += drawSolventFrontToolStripMenuItem_Click;
             // 
             // toolStripSeparator1
             // 
@@ -153,7 +156,7 @@
             // statusStrip1
             // 
             statusStrip1.ImageScalingSize = new Size(32, 32);
-            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabelTip, toolStripStatusLabelRF });
+            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabelTip, toolStripStatusLabelRF, toolStripStatusLabelNearPoint });
             statusStrip1.Location = new Point(0, 623);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(1338, 42);
@@ -172,6 +175,13 @@
             toolStripStatusLabelRF.Name = "toolStripStatusLabelRF";
             toolStripStatusLabelRF.Size = new Size(400, 32);
             toolStripStatusLabelRF.Text = "Mark baseline and solvent front first";
+            // 
+            // toolStripStatusLabelNearPoint
+            // 
+            toolStripStatusLabelNearPoint.BackColor = Color.Silver;
+            toolStripStatusLabelNearPoint.Name = "toolStripStatusLabelNearPoint";
+            toolStripStatusLabelNearPoint.Size = new Size(109, 32);
+            toolStripStatusLabelNearPoint.Text = "No point";
             // 
             // MainWindow
             // 
@@ -212,5 +222,6 @@
         private ToolStripMenuItem drawSolventFrontToolStripMenuItem;
         private ToolStripSeparator toolStripSeparator1;
         private ToolStripMenuItem exportImageToolStripMenuItem;
+        private ToolStripStatusLabel toolStripStatusLabelNearPoint;
     }
 }

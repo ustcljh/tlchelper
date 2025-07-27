@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -130,6 +131,30 @@ namespace TLCHelper
                 }
             }
 
+            penWidth = 5;
+
+            if (drawBaselineToolStripMenuItem.Checked && BaselinePoints.Count == 2)
+            {
+                using (Pen pen = new Pen(Color.Blue, penWidth))
+                {
+                    PointF p1 = new(BaselinePoints[0].X * TLCdraw.Width, BaselinePoints[0].Y * TLCdraw.Height);
+                    PointF p2 = new(BaselinePoints[1].X * TLCdraw.Width, BaselinePoints[1].Y * TLCdraw.Height);
+
+                    graphics.DrawLine(pen, p1, p2);
+                }
+            }
+
+            if (drawSolventFrontToolStripMenuItem.Checked && SolventFrontPoints.Count == 2)
+            {
+                using (Pen pen = new Pen(Color.Black, penWidth))
+                {
+                    PointF p1 = new(SolventFrontPoints[0].X * TLCdraw.Width, SolventFrontPoints[0].Y * TLCdraw.Height);
+                    PointF p2 = new(SolventFrontPoints[1].X * TLCdraw.Width, SolventFrontPoints[1].Y * TLCdraw.Height);
+
+                    graphics.DrawLine(pen, p1, p2);
+                }
+            }
+
             pictureBox1.Image = TLCdraw;
         }
 
@@ -139,6 +164,7 @@ namespace TLCHelper
         }
 
         List<PointF> ClickPointList = new();
+        List<int> nearPointIndexList = new();
         bool MarkingTLCPlate = false;
         bool MarkingBaseline = false;
         bool MarkingSolventFront = false;
@@ -183,7 +209,7 @@ namespace TLCHelper
             {
                 markingPoints.Add(new TLCMarkingPoint() { Name = "Compound", Position = new(x, y) });
                 MarkingResultPoint = false;
-                pictureBox1.Cursor = Cursors.Default;
+                pictureBox1.Cursor = Cursors.Cross;
 
                 RefreshImageView();
             }
@@ -202,7 +228,7 @@ namespace TLCHelper
                     case 2:
                         MarkingBaseline = false;
                         toolStripStatusLabelTip.Text = "Ready";
-                        pictureBox1.Cursor = Cursors.Default;
+                        pictureBox1.Cursor = Cursors.Cross;
 
                         BaselinePoints = ClickPointList.ToList();
                         ClickPointList.Clear();
@@ -234,7 +260,7 @@ namespace TLCHelper
                     case 2:
                         MarkingSolventFront = false;
                         toolStripStatusLabelTip.Text = "Ready";
-                        pictureBox1.Cursor = Cursors.Default;
+                        pictureBox1.Cursor = Cursors.Cross;
 
                         SolventFrontPoints = ClickPointList.ToList();
                         ClickPointList.Clear();
@@ -282,7 +308,7 @@ namespace TLCHelper
 
                         MarkingTLCPlate = false;
                         toolStripStatusLabelTip.Text = "Ready";
-                        pictureBox1.Cursor = Cursors.Default;
+                        pictureBox1.Cursor = Cursors.Cross;
 
                         TLCimage = ImageProcess.Transform(new Bitmap(TLCimage), EdgePointList2.ToArray(), 1000, 500);
                         RefreshImageView();
@@ -293,6 +319,21 @@ namespace TLCHelper
                     default:
                         break;
                 }
+            }
+            else if (pictureBox1.Cursor == Cursors.Hand)
+            {
+                if (nearPointIndexList.Count == 0)
+                {
+                    pictureBox1.Cursor = Cursors.Cross;
+                    return;
+                }
+
+                CompoundEdit editor = new();
+                editor.editingPoint = markingPoints[nearPointIndexList[0]];
+                editor.parent = this;
+
+                editor.ShowDialog();
+                RefreshImageView();
             }
         }
 
@@ -337,7 +378,7 @@ namespace TLCHelper
             }
         }
 
-        private double? ComputeRF(PointF point)
+        public double? ComputeRF(PointF point)
         {
             if (BaselinePoints.Count() != 2 || SolventFrontPoints.Count() != 2)
             {
@@ -353,14 +394,55 @@ namespace TLCHelper
 
         private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
         {
+            float x = (float)e.X / pictureBox1.Width;
+            float y = (float)e.Y / pictureBox1.Height;
+
+            double threshold = 20.0 / Math.Max(pictureBox1.Width, pictureBox1.Height);
+
+            nearPointIndexList.Clear();
+            for (int i = 0; i < markingPoints.Count; ++i)
+            {
+                var p = markingPoints[i];
+                var distance = Math.Sqrt((x - p.Position.X) * (x - p.Position.X) + (y - p.Position.Y) * (y - p.Position.Y));
+
+                // Debug.WriteLine(distance);
+                if (distance < threshold)
+                {
+                    nearPointIndexList.Add(i);
+                }
+            }
+
+            if (nearPointIndexList.Count > 0)
+            {
+                var index = nearPointIndexList[0];
+                string statusBarText = $"Click to edit: {markingPoints[index].Name}";
+
+                if (nearPointIndexList.Count > 1)
+                {
+                    statusBarText += $" ({nearPointIndexList.Count - 1} more)";
+                }
+
+                toolStripStatusLabelNearPoint.Text = statusBarText;
+            }
+            else
+            {
+                toolStripStatusLabelNearPoint.Text = $"No point";
+            }
+
+            if (pictureBox1.Cursor == Cursors.Cross && nearPointIndexList.Count != 0)
+            {
+                pictureBox1.Cursor = Cursors.Hand;
+            }
+            if (pictureBox1.Cursor == Cursors.Hand && nearPointIndexList.Count == 0)
+            {
+                pictureBox1.Cursor = Cursors.Cross;
+            }
+
             if (TLCimage == null || BaselinePoints.Count() != 2 || SolventFrontPoints.Count() != 2)
             {
                 toolStripStatusLabelRF.Text = "Mark baseline and solvent front first";
                 return;
             }
-
-            float x = (float)e.X / pictureBox1.Width;
-            float y = (float)e.Y / pictureBox1.Height;
 
             var RF = ComputeRF(new PointF(x, y));
 
@@ -386,6 +468,18 @@ namespace TLCHelper
 
         private void MainWindow_Resize(object sender, EventArgs e)
         {
+            RefreshImageView();
+        }
+
+        private void drawBaselineToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            drawBaselineToolStripMenuItem.Checked = !drawBaselineToolStripMenuItem.Checked;
+            RefreshImageView();
+        }
+
+        private void drawSolventFrontToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            drawSolventFrontToolStripMenuItem.Checked = !drawSolventFrontToolStripMenuItem.Checked;
             RefreshImageView();
         }
     }

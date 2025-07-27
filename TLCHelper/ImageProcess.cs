@@ -279,6 +279,11 @@ namespace TLCHelper
 
         public static Bitmap ResizeImage(Image original, int targetWidth, int targetHeight)
         {
+            if (targetHeight == 0 || targetWidth == 0)
+            {
+                return new Bitmap(10, 10);
+            }
+
             Bitmap resized = new Bitmap(targetWidth, targetHeight);
             using (Graphics g = Graphics.FromImage(resized))
             {
