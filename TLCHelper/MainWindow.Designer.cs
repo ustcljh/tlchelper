@@ -203,6 +203,8 @@
             MainMenuStrip = menuStrip1;
             Name = "MainWindow";
             Text = "TLC Helper";
+            FormClosing += MainWindow_FormClosing;
+            Load += MainWindow_Load;
             Resize += MainWindow_Resize;
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();

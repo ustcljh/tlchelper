@@ -24,7 +24,7 @@ namespace TLCHelper
         }
 
         Bitmap? TLCimage = null;
-        List<TLCMarkingPoint> markingPoints = new List<TLCMarkingPoint>();
+        public List<TLCMarkingPoint> markingPoints = new List<TLCMarkingPoint>();
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
@@ -71,6 +71,8 @@ namespace TLCHelper
         public MainWindow()
         {
             InitializeComponent();
+
+            markedDotsWindow = new(this);
         }
 
         private void loadPhotoToolStripMenuItem_Click(object sender, EventArgs e)
@@ -161,6 +163,11 @@ namespace TLCHelper
             }
 
             pictureBox1.Image = TLCdraw;
+
+            if (markedDotsWindow != null)
+            {
+                markedDotsWindow.RefreshMarkedDotsView();
+            }
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
@@ -504,6 +511,17 @@ namespace TLCHelper
         {
             toolStripStatusLabelTip.Text = "Click on the marked point to delete.";
             MarkingPointToDelete = true;
+        }
+
+        MarkedDots? markedDotsWindow;
+        private void MainWindow_Load(object sender, EventArgs e)
+        {
+            markedDotsWindow.Show();
+        }
+
+        private void MainWindow_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            markedDotsWindow.Close();
         }
     }
 }

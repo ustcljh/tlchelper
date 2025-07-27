@@ -35,7 +35,7 @@ namespace TLCHelper
                 var rf = parent.ComputeRF(editingPoint.Position);
                 if (rf != null)
                 {
-                    textBoxRf.Text = rf.ToString();
+                    textBoxRf.Text = $"{rf:F3}";
                 }
             }
         }
