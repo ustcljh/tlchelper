@@ -35,6 +35,7 @@
             markSolventFrontToolStripMenuItem = new ToolStripMenuItem();
             markToolStripMenuItem = new ToolStripMenuItem();
             markSpeciesPointToolStripMenuItem = new ToolStripMenuItem();
+            toolStripMenuItemDelete = new ToolStripMenuItem();
             drawBaselineToolStripMenuItem = new ToolStripMenuItem();
             drawSolventFrontToolStripMenuItem = new ToolStripMenuItem();
             toolStripSeparator1 = new ToolStripSeparator();
@@ -92,7 +93,7 @@
             // 
             // markToolStripMenuItem
             // 
-            markToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { markSpeciesPointToolStripMenuItem, drawBaselineToolStripMenuItem, drawSolventFrontToolStripMenuItem, toolStripSeparator1, exportImageToolStripMenuItem });
+            markToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { markSpeciesPointToolStripMenuItem, toolStripMenuItemDelete, drawBaselineToolStripMenuItem, drawSolventFrontToolStripMenuItem, toolStripSeparator1, exportImageToolStripMenuItem });
             markToolStripMenuItem.Name = "markToolStripMenuItem";
             markToolStripMenuItem.Size = new Size(116, 36);
             markToolStripMenuItem.Text = "Analyse";
@@ -101,34 +102,42 @@
             // 
             markSpeciesPointToolStripMenuItem.Name = "markSpeciesPointToolStripMenuItem";
             markSpeciesPointToolStripMenuItem.ShortcutKeyDisplayString = "S";
-            markSpeciesPointToolStripMenuItem.Size = new Size(375, 44);
+            markSpeciesPointToolStripMenuItem.Size = new Size(417, 44);
             markSpeciesPointToolStripMenuItem.Text = "Mark species point";
             markSpeciesPointToolStripMenuItem.Click += markSpeciesPointToolStripMenuItem_Click;
+            // 
+            // toolStripMenuItemDelete
+            // 
+            toolStripMenuItemDelete.Name = "toolStripMenuItemDelete";
+            toolStripMenuItemDelete.ShortcutKeyDisplayString = "Del";
+            toolStripMenuItemDelete.Size = new Size(417, 44);
+            toolStripMenuItemDelete.Text = "Delete marked point";
+            toolStripMenuItemDelete.Click += toolStripMenuItemDelete_Click;
             // 
             // drawBaselineToolStripMenuItem
             // 
             drawBaselineToolStripMenuItem.Name = "drawBaselineToolStripMenuItem";
-            drawBaselineToolStripMenuItem.Size = new Size(375, 44);
+            drawBaselineToolStripMenuItem.Size = new Size(417, 44);
             drawBaselineToolStripMenuItem.Text = "Draw baseline";
             drawBaselineToolStripMenuItem.Click += drawBaselineToolStripMenuItem_Click;
             // 
             // drawSolventFrontToolStripMenuItem
             // 
             drawSolventFrontToolStripMenuItem.Name = "drawSolventFrontToolStripMenuItem";
-            drawSolventFrontToolStripMenuItem.Size = new Size(375, 44);
+            drawSolventFrontToolStripMenuItem.Size = new Size(417, 44);
             drawSolventFrontToolStripMenuItem.Text = "Draw solvent front";
             drawSolventFrontToolStripMenuItem.Click += drawSolventFrontToolStripMenuItem_Click;
             // 
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new Size(372, 6);
+            toolStripSeparator1.Size = new Size(414, 6);
             // 
             // exportImageToolStripMenuItem
             // 
             exportImageToolStripMenuItem.Name = "exportImageToolStripMenuItem";
             exportImageToolStripMenuItem.ShortcutKeyDisplayString = "X";
-            exportImageToolStripMenuItem.Size = new Size(375, 44);
+            exportImageToolStripMenuItem.Size = new Size(417, 44);
             exportImageToolStripMenuItem.Text = "Export image";
             exportImageToolStripMenuItem.Click += exportImageToolStripMenuItem_Click;
             // 
@@ -223,5 +232,6 @@
         private ToolStripSeparator toolStripSeparator1;
         private ToolStripMenuItem exportImageToolStripMenuItem;
         private ToolStripStatusLabel toolStripStatusLabelNearPoint;
+        private ToolStripMenuItem toolStripMenuItemDelete;
     }
 }

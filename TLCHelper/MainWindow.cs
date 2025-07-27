@@ -58,6 +58,11 @@ namespace TLCHelper
                 exportImageToolStripMenuItem_Click("ShortcutKey", new EventArgs());
                 return true; // handled
             }
+            if (keyData == Keys.Delete)
+            {
+                toolStripMenuItemDelete_Click("ShortcutKey", new EventArgs());
+                return true;
+            }
 
             return base.ProcessCmdKey(ref msg, keyData);
         }
@@ -320,6 +325,16 @@ namespace TLCHelper
                         break;
                 }
             }
+            else if (MarkingPointToDelete)
+            {
+                if (nearPointIndexList.Count > 0)
+                {
+                    markingPoints.RemoveAt(nearPointIndexList[0]);
+                    MarkingPointToDelete = false;
+
+                    RefreshImageView();
+                }
+            }
             else if (pictureBox1.Cursor == Cursors.Hand)
             {
                 if (nearPointIndexList.Count == 0)
@@ -481,6 +496,14 @@ namespace TLCHelper
         {
             drawSolventFrontToolStripMenuItem.Checked = !drawSolventFrontToolStripMenuItem.Checked;
             RefreshImageView();
+        }
+
+        bool MarkingPointToDelete = false;
+
+        private void toolStripMenuItemDelete_Click(object sender, EventArgs e)
+        {
+            toolStripStatusLabelTip.Text = "Click on the marked point to delete.";
+            MarkingPointToDelete = true;
         }
     }
 }
